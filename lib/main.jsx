@@ -12,18 +12,18 @@ export default class App extends React.Component {
   }
 
   updateProperties(filteredWeather) {
-    filteredWeather.forEach((item)=>{
-      Object.assign(item, { key: Date.now() });
-    })
+    // filteredWeather.forEach((item)=>{
+    //   Object.assign(item, { key: Date.now() });
+    // })
     this.setState({locationWeather: filteredWeather});
   }
 
-// 'http://weatherly-api.herokuapp.com/api/weather'
   updateSubmit(location) {
-    $.getJSON('http://weatherly-api.herokuapp.com/api/weather').then((weather)=>{
-      let filteredWeather = weather.filter((weatherArray)=>{
-        return weatherArray.location === location;
-      });
+    $.getJSON('http://api.openweathermap.org/data/2.5/forecast/city?q=' + location + '&APPID=e93493c31b39ffb87f0f7668675192ce').then((filteredWeather) => {
+      console.log(filteredWeather);
+      // let filteredWeather = weather.filter((weatherArray)=>{
+      //   return weatherArray.city.coord.name === location;
+      // });
 
       this.updateProperties(filteredWeather);
     });
@@ -83,8 +83,8 @@ class LocationInput extends React.Component {
 const DisplayWeather = ({appState}) => {
   return (
     <ul>
-      {appState.map((weather) => {
-         return <DailyWeather key = {weather.id} date = {weather.date} hourl = {weather.hourly}/>
+      {Object.keys(appState).map((weather) => {
+         return <DailyWeather key = {weather} date = {weather} hourl = {weather}/>
        })
       }
     </ul>

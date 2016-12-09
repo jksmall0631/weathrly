@@ -6,15 +6,19 @@ export default class App extends React.Component {
   constructor() {
     super();
     this.state = {
-      locationWeather: null,
+      locationWeather: [],
     };
     this.updateSubmit = this.updateSubmit.bind(this);
   }
 
   updateProperties(filteredWeather) {
+    filteredWeather.forEach((item)=>{
+      Object.assign(item, { key: Date.now() });
+    })
     this.setState({locationWeather: filteredWeather});
   }
 
+// 'http://weatherly-api.herokuapp.com/api/weather'
   updateSubmit(location) {
     $.getJSON('http://weatherly-api.herokuapp.com/api/weather').then((weather)=>{
       let filteredWeather = weather.filter((weatherArray)=>{
@@ -76,33 +80,16 @@ class LocationInput extends React.Component {
   }
 }
 
-const DisplayWeather = ({locationWeather}) => {
+const DisplayWeather = ({appState}) => {
   return (
-    // <div>
-    //   <ul>
-    //   {locationWeather.map((weather) => {
-    //      return <Idea key={idea.id} {...idea}/>
-    //    })
-    //   }
-    //   </ul>
-    // </div>
     <ul>
-      {locationWeather.map((weather) => {
-         return <DailyWeather {...weatherProps}/>
+      {appState.map((weather) => {
+         return <DailyWeather key = {weather.id} date = {weather.date} hourl = {weather.hourly}/>
        })
       }
     </ul>
   );
 };
-
-// const Idea = ({title, body}) => {
-//   return (
-//     <div>
-//       <h3 className="IdeasListItem-title"> {title}</h3>
-//       <div className= "IdeasListItem-body">{body}</div>
-//     </div>
-//     )
-// }
 
 const DailyWeather = ({date, hourly}) => {
   return (

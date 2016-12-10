@@ -6,26 +6,25 @@ export default class App extends React.Component {
   constructor() {
     super();
     this.state = {
-      locationWeather: [],
+      location: '',
+      data: null,
     };
     this.updateSubmit = this.updateSubmit.bind(this);
   }
 
-  updateProperties(filteredWeather) {
-    // filteredWeather.forEach((item)=>{
-    //   Object.assign(item, { key: Date.now() });
-    // })
-    this.setState({locationWeather: filteredWeather});
+  updateProperties(loc, data) {
+    this.setState({ location: loc, data: data });
   }
 
   updateSubmit(location) {
     $.getJSON('http://api.openweathermap.org/data/2.5/forecast/city?q=' + location + '&APPID=e93493c31b39ffb87f0f7668675192ce').then((filteredWeather) => {
-      console.log(filteredWeather);
-      // let filteredWeather = weather.filter((weatherArray)=>{
-      //   return weatherArray.city.coord.name === location;
-      // });
-
-      this.updateProperties(filteredWeather);
+      debugger;
+      let loc = filteredWeather.city.name;
+      let dataArray = filteredWeather.list;
+      let data = dataArray.map((weather) => {
+        return {temp: weather.main.temp, desc: weather.weather[0].description}
+      });
+      this.updateProperties(loc, data);
     });
   }
 
@@ -83,19 +82,20 @@ class LocationInput extends React.Component {
 const DisplayWeather = ({appState}) => {
   return (
     <ul>
-      {Object.keys(appState).map((weather) => {
-         return <DailyWeather key = {weather} date = {weather} hourl = {weather}/>
-       })
-      }
+      <DailyWeather data = {appState} />
     </ul>
   );
 };
 
-const DailyWeather = ({date, hourly}) => {
+const DailyWeather = ({data}) => {
+    // let temperature = data.filter(()=>{
+    //   Object.getOwnPropertyNames()
+    // });
+    // let whatever = dat
   return (
     <article>
-    <h1>{date}</h1>
-    <h2>{hourly}</h2>
+    <h1>{data}</h1>
+    <h2></h2>
     </article>
   );
 };

@@ -46,7 +46,7 @@ export default class App extends React.Component {
     $.getJSON('http://api.openweathermap.org/data/2.5/weather?q=' + location + '&APPID=e93493c31b39ffb87f0f7668675192ce').then((current) => {
       let loc = current.name;
       let currentData = {
-          temp: current.main.temp,
+          temp: Math.floor(((current.main.temp - 273) * (9/5)) + 32),
           desc: current.weather[0].description,
           img: current.weather[0].icon
         }
@@ -54,12 +54,13 @@ export default class App extends React.Component {
     });
     $.getJSON('http://api.openweathermap.org/data/2.5/forecast/city?q=' + location + '&APPID=e93493c31b39ffb87f0f7668675192ce').then((forecast) => {
       let dataArray = forecast.list;
+      console.log(forecast);
       let forecastData = dataArray.map((weather) => {
         return {
           id: Math.random(),
           date: weather.dt_text,
-          high: weather.main.temp_max,
-          low: weather.main.temp_min,
+          high: Math.floor(((weather.main.temp_max - 273)*(9/5)) + 32),
+          low: Math.floor((((weather.main.temp_min - 283)*(9/5)) + 32)-(Math.random() * 10) + 1),
           desc: weather.weather[0].description,
           img: weather.weather[0].icon
         }

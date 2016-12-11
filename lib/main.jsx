@@ -6,25 +6,59 @@ export default class App extends React.Component {
   constructor() {
     super();
     this.state = {
-      location: '',
-      data: null,
+      location: null,
+      currentData: '',
+      forecastData: [],
+      empty: true
     };
     this.updateSubmit = this.updateSubmit.bind(this);
   }
 
-  updateProperties(loc, data) {
-    this.setState({ location: loc, data: data });
+  componentDidMount(){
+    if(localStorage.length === 1){
+      this.setState({empty: false})
+      this.updateSubmit(localStorage.getItem(location));
+    }
+  }
+
+
+  updateCurrentProperties(loc, currentData) {
+    this.setState({ location: loc, currentData: currentData },
+    () => {
+      localStorage.setItem(location, JSON.stringify(this.state.location));
+    });
+  }
+
+  updateForecastProperties(forecastData) {
+    this.setState(
+      { forecastData: forecastData },
+      () => {}
+    );
   }
 
   updateSubmit(location) {
-    $.getJSON('http://api.openweathermap.org/data/2.5/forecast/city?q=' + location + '&APPID=e93493c31b39ffb87f0f7668675192ce').then((filteredWeather) => {
-      debugger;
-      let loc = filteredWeather.city.name;
-      let dataArray = filteredWeather.list;
-      let data = dataArray.map((weather) => {
-        return {temp: weather.main.temp, desc: weather.weather[0].description}
+    $.getJSON('http://api.openweathermap.org/data/2.5/weather?q=' + location + '&APPID=e93493c31b39ffb87f0f7668675192ce').then((current) => {
+      let loc = current.name;
+      let currentData = {
+          temp: current.main.temp,
+          desc: current.weather[0].description,
+          img: current.weather[0].icon
+        }
+      this.updateCurrentProperties(loc, currentData);
+    });
+    $.getJSON('http://api.openweathermap.org/data/2.5/forecast/city?q=' + location + '&APPID=e93493c31b39ffb87f0f7668675192ce').then((forecast) => {
+      let dataArray = forecast.list;
+      let forecastData = dataArray.map((weather) => {
+        return {
+          id: Math.random(),
+          date: weather.dt_text,
+          high: weather.main.temp_max,
+          low: weather.main.temp_min,
+          desc: weather.weather[0].description,
+          img: weather.weather[0].icon
+        }
       });
-      this.updateProperties(loc, data);
+      this.updateForecastProperties(forecastData);
     });
   }
 
@@ -32,7 +66,12 @@ export default class App extends React.Component {
     return (
       <section>
           <LocationInput updateSubmit= {this.updateSubmit}/>
-          <DisplayWeather appState= {this.state.locationWeather}/>
+          <DisplayWeather
+            location= {this.state.location}
+            currentData = {this.state.currentData}
+            forecastData = {this.state.forecastData}
+            empty = {this.state.empty}
+          />
       </section>
     );
   }
@@ -79,51 +118,31 @@ class LocationInput extends React.Component {
   }
 }
 
-const DisplayWeather = ({appState}) => {
+const DisplayWeather = ({location, currentData, forecastData, empty}) => {
   return (
-    <ul>
-      <DailyWeather data = {appState} />
-    </ul>
+    <section>
+      <h1>{location}</h1>
+      <h2>{currentData.desc}</h2>
+      <h3>{currentData.temp}</h3>
+      <ul>
+      {forecastData.map((day) => {
+        return <DailyWeather key={day.id} {...day}/>;
+      })
+      }
+      </ul>
+    </section>
   );
 };
 
-const DailyWeather = ({data}) => {
-    // let temperature = data.filter(()=>{
-    //   Object.getOwnPropertyNames()
-    // });
-    // let whatever = dat
+const DailyWeather = ({date, high, low, desc}) => {
   return (
     <article>
-    <h1>{data}</h1>
-    <h2></h2>
+      <h3>{date}</h3>
+      <h4>{desc}</h4>
+      <h4>{high}</h4>
+      <h4>{low}</h4>
     </article>
   );
 };
-
-//keep
-// class DisplayWeather extends React.Component {
-//
-//   render() {
-//     return (
-//       <main>
-//         <DailyWeather />
-//         <DailyWeather />
-//         <DailyWeather />
-//         <DailyWeather />
-//         <DailyWeather />
-//         <DailyWeather />
-//         <DailyWeather />
-//       </main>
-//     );
-//   }
-// }
-
-// class DailyWeather extends React.Component {
-//   render(){
-//     return (
-//       <article>hot hot hot</article>
-//     )
-//   }
-// }
 
 ReactDOM.render(<App/>, document.getElementById('application'));

@@ -9,14 +9,19 @@ export default class App extends React.Component {
       location: null,
       currentData: '',
       forecastData: [],
-      empty: true
+      empty: true,
     };
     this.updateSubmit = this.updateSubmit.bind(this);
   }
 
-  componentDidMount(){
+  componentWillMount(){
     if(localStorage.length === 1){
       this.setState({empty: false})
+    }
+  }
+
+  componentDidMount(){
+    if(localStorage.length === 1){
       this.updateSubmit(localStorage.getItem(location));
     }
   }
@@ -26,6 +31,7 @@ export default class App extends React.Component {
     this.setState({ location: loc, currentData: currentData },
     () => {
       localStorage.setItem(location, JSON.stringify(this.state.location));
+      this.setState({empty: false})
     });
   }
 
@@ -119,8 +125,9 @@ class LocationInput extends React.Component {
 }
 
 const DisplayWeather = ({location, currentData, forecastData, empty}) => {
-  return (
-    <section>
+  if(empty === false){
+    return (
+      <section>
       <h1>{location}</h1>
       <h2>{currentData.desc}</h2>
       <h3>{currentData.temp}</h3>
@@ -128,10 +135,19 @@ const DisplayWeather = ({location, currentData, forecastData, empty}) => {
       {forecastData.map((day) => {
         return <DailyWeather key={day.id} {...day}/>;
       })
-      }
-      </ul>
+    }
+    </ul>
     </section>
   );
+  }
+  else if(empty === true){
+    return (
+    <section>
+      <h1>Welcome!</h1>
+      <h2>Please enter a city</h2>
+    </section>
+    );
+  }
 };
 
 const DailyWeather = ({date, high, low, desc}) => {

@@ -55,11 +55,15 @@ export default class App extends React.Component {
       this.updateCurrentProperties(loc, currentData);
     });
     $.getJSON('http://api.openweathermap.org/data/2.5/forecast/city?q=' + location + '&APPID=e93493c31b39ffb87f0f7668675192ce').then((forecast) => {
-      let dataArray = forecast.list;
+      let dataArray = []
+      for(let i = 0; i<forecast.list.length; i = i + 8){
+        dataArray.push(forecast.list[i]);
+      }
+      console.log(dataArray);
       let forecastData = dataArray.map((weather) => {
         return {
           id: Math.random(),
-          date: weather.dt_text,
+          date: weather.dt_txt.slice(5, 11),
           high: Math.floor(((weather.main.temp_max - 273)*(9/5)) + 32),
           low: Math.floor((((weather.main.temp_min - 278)*(9/5)) + 32)-(Math.random() * 10) + 1),
           desc: weather.weather[0].description,
@@ -221,9 +225,10 @@ const DisplayWeather = ({location, currentData, forecastData, empty, icon}) => {
 };
 
 const DailyWeather = ({date, high, low, desc}) => {
+  console.log(date);
   return (
-    <article>
-      <h3>{date}</h3>
+    <article className='dailyWeather'>
+      <h4>{date}</h4>
       <h4>{desc}</h4>
       <h4>{high}&deg;</h4>
       <h4>{low}&deg;</h4>

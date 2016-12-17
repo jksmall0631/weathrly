@@ -6,27 +6,24 @@ export default class App extends React.Component {
   constructor() {
     super();
     this.state = {
-      location: null,
       currentData: '',
       forecastData: [],
       empty: true,
-      icon: '',
     };
     this.updateSubmit = this.updateSubmit.bind(this);
   }
-
-  componentWillMount(){
-    if(localStorage.length === 1){
-      this.setState({empty: false})
-    }
-  }
+  //
+  // componentWillMount(){
+  //   if(localStorage.length === 1){
+  //     this.setState({empty: false})
+  //   }
+  // }
 
   componentDidMount(){
     if(localStorage.length === 1){
       this.updateSubmit(localStorage.getItem(location));
     }
   }
-
 
   updateCurrentProperties(loc, currentData) {
     this.setState({ location: loc, currentData: currentData },
@@ -48,20 +45,21 @@ export default class App extends React.Component {
       let currentData = {
           temp: Math.floor(((current.main.temp - 273) * (9/5)) + 32),
           desc: current.weather[0].description,
-          img: current.weather[0].icon
+          img: this.filterImg(current),
         }
-      this.sortIcons(currentData.img);
       this.updateCurrentProperties(loc, currentData);
     });
+
     $.getJSON('http://api.openweathermap.org/data/2.5/forecast/city?q=' + location + '&APPID=e93493c31b39ffb87f0f7668675192ce').then((forecast) => {
-      let dataArray = []
+      let dataArray = [];
       for(let i = 0; i<forecast.list.length; i = i + 8){
         dataArray.push(forecast.list[i]);
       }
-      let iconArray = [];
-      dataArray.forEach((weather)=>{
-        this.sortDaysIcons(weather.weather[0].icon, iconArray);
+
+      let iconArray = dataArray.map((current)=>{
+        return this.filterImg(current);
       });
+
       let forecastData = dataArray.map((weather, i) => {
         return {
           id: Math.random(),
@@ -76,125 +74,29 @@ export default class App extends React.Component {
     });
   }
 
-  sortIcons(img){
-    switch(img) {
-      case '01d':
-        this.setState({icon: 'flaticon-sun'});
-        break;
-      case '02d':
-        this.setState({icon: 'flaticon-cloudy'});
-        break;
-      case '03d':
-        this.setState({icon: 'flaticon-cloud'});
-        break;
-      case '04d':
-        this.setState({icon: 'flaticon-cloud'});
-        break;
-      case '09d':
-        this.setState({icon: 'flaticon-rain-1'});
-        break;
-      case '10d':
-        this.setState({icon: 'flaticon-rain-2'});
-        break;
-      case '11d':
-        this.setState({icon: 'flaticon-storm-2'});
-        break;
-      case '13d':
-        this.setState({icon: 'flaticon-snowing-1'});
-        break;
-      case '50d':
-        this.setState({icon: 'Flaticon-wind-5'});
-        break;
-      case '01n':
-        this.setState({icon: 'flaticon-moon'});
-        break;
-      case '02n':
-        this.setState({icon: 'flaticon-cloud'});
-        break;
-      case '03n':
-        this.setState({icon: 'flaticon-cloud'});
-        break;
-      case '04n':
-        this.setState({icon: 'flaticon-cloud'});
-        break;
-      case '09n':
-        this.setState({icon: 'flaticon-rain-1'});
-        break;
-      case '10n':
-        this.setState({icon: 'flaticon-rain'});
-        break;
-      case '11n':
-        this.setState({icon: 'flaticon-storm'});
-        break;
-      case '13n':
-        this.setState({icon: 'flaticon-snowing'});
-        break;
-      case '50n':
-        this.setState({icon: 'flaticon-wind-5'});
-        break;
-      default:
-        console.log('no icon chosen');
-    }
-  }
-
-  sortDaysIcons(img, iconArray){
-    if(img === '01d'){
-      iconArray.push('flaticon-sun');
-    }
-    else if(img === '02d'){
-      iconArray.push('flaticon-cloudy');
-    }
-    else if(img === '03d'){
-      iconArray.push('flaticon-cloud');
-    }
-    else if(img === '04d'){
-      iconArray.push('flaticon-cloud');
-    }
-    else if(img === '09d'){
-      iconArray.push('flaticon-rain-1');
-    }
-    else if(img === '10d'){
-      iconArray.push('flaticon-rain-2');
-    }
-    else if(img === '11d'){
-      iconArray.push('flaticon-storm-2');
-    }
-    else if(img === '13d'){
-      iconArray.push('flaticon-snowing-1');
-    }
-    else if(img === '50d'){
-      iconArray.push('flaticon-wind-5');
-    }
-    else if(img === '01n'){
-      iconArray.push('flaticon-moon');
-    }
-    else if(img === '02n'){
-      iconArray.push('flaticon-cloud');
-    }
-    else if(img === '03n'){
-      iconArray.push('flaticon-cloud');
-    }
-    else if(img === '04n'){
-      iconArray.push('flaticon-cloud');
-    }
-    else if(img === '09n'){
-      iconArray.push('flaticon-rain-1');
-    }
-    else if(img === '10n'){
-      iconArray.push('flaticon-rain');
-    }
-    else if(img === '11n'){
-      iconArray.push('flaticon-storm');
-    }
-    else if(img === '13n'){
-      iconArray.push('flaticon-snowing');
-    }
-    else if(img === '50n'){
-      iconArray.push('flaticon-sun');
-    }
-    else{
-      console.log(iconArray);
-    }
+  filterImg(current){
+    let currentIcon = current.weather[0].icon
+    let icon = {
+      '01d': 'flaticon-sun',
+      '02d': 'flaticon-cloudy',
+      '03d': 'flaticon-cloud',
+      '04d': 'flaticon-cloud',
+      '09d': 'flaticon-rain-1',
+      '10d': 'flaticon-rain-2',
+      '11d': 'flaticon-storm-2',
+      '13d': 'flaticon-snowing-1',
+      '50d': 'flaticon-umbrella',
+      '01n': 'flaticon-moon',
+      '02n': 'flaticon-cloud',
+      '03n': 'flaticon-cloud',
+      '04n': 'flaticon-cloud',
+      '09n': 'flaticon-rain-1',
+      '10n': 'flaticon-rain',
+      '11n': 'flaticon-storm',
+      '13n': 'flaticon-snowing',
+      '50n': 'flaticon-umbrella',
+    }[`${currentIcon}`];
+    return icon;
   }
 
   render() {
@@ -206,7 +108,6 @@ export default class App extends React.Component {
             currentData = {this.state.currentData}
             forecastData = {this.state.forecastData}
             empty = {this.state.empty}
-            icon = {this.state.icon}
           />
       </section>
     );
@@ -264,7 +165,7 @@ const DisplayWeather = ({location, currentData, forecastData, empty, icon}) => {
         </section>
         <section className= 'weather'>
           <h2>{currentData.temp}&deg;</h2>
-          <span className= {icon}></span>
+          <span className= {currentData.img}></span>
           <h3>{currentData.desc}</h3>
         </section>
           <ul>

@@ -1,31 +1,3 @@
-# React Starter Kit
+Weather application created to practice using APIs.
 
-To install the dependencies:
-
-```
-npm install
-```
-
-To fire up a development server:
-
-```
-npm start
-```
-
-Once the server is running, you can visit:
-
-* `http://localhost:8080/webpack-dev-server/` to run your application.
-* `http://localhost:8080/webpack-dev-server/test.html` to run your test suite in the browser.
-
-To build the static files:
-
-```js
-npm run build
-```
-
-
-To run tests in Node:
-
-```js
-npm test
-```
+<kbd><img src="https://github.com/jksmall0631/weathrly/blob/master/weathrly.png" alt="weathrly image" width="1000" height="529"></kdb>
